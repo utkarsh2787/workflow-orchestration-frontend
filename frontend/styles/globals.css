@@ -1,0 +1,20 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root{
+  --bg: #000;
+}
+
+html,body,#__next{height:100%;}
+body{background:var(--bg);}
+
+@keyframes gradient-slow {
+  0% { transform: translateX(-10%); }
+  50% { transform: translateX(10%); }
+  100% { transform: translateX(-10%); }
+}
+
+.animate-gradient-slow {
+  animation: gradient-slow 9s linear infinite;
+}
