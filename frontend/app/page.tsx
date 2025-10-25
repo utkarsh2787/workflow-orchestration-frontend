@@ -75,7 +75,7 @@ export default function Home() {
           <li>Compose into workflows with ordering, retries and conditional branches.</li>
           <li>Schedule or trigger runs; monitor logs, failures and retries in real time.</li>
         </ol>
-      </section>
+       </section>
     </div>
   )
 }

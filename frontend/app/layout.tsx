@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Link from "next/link";
+import Nav from "./components/Nav";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -29,24 +30,11 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <div className="antialiased bg-black text-zinc-50 min-h-screen">
-          <header className="w-full border-b border-zinc-800 bg-gradient-to-b from-black/60 to-transparent backdrop-blur-sm">
-            <nav className="mx-auto flex max-w-6xl items-center justify-between p-4 px-6">
-              <Link href="/" className="flex items-center gap-3">
-                <div className="h-10 w-10 rounded-lg bg-gradient-to-tr from-[#00ffea] to-[#6a00ff] flex items-center justify-center text-black font-bold">W</div>
-                <div className="hidden sm:block">
-                  <div className="text-sm font-semibold">Workflow Orchestration</div>
-                  <div className="text-xs text-zinc-400">Schedule · Automate · Observe</div>
-                </div>
-              </Link>
-
-              <div className="flex items-center gap-4">
-                <Link href="/login" className="text-sm text-zinc-300 hover:text-zinc-100">Login</Link>
-                <Link href="/register" className="text-sm text-zinc-300 hover:text-zinc-100">Register</Link>
-              </div>
-            </nav>
+          <header className="fixed top-0 left-0 right-0 z-50 w-full border-b border-zinc-800 bg-gradient-to-b from-black/60 to-transparent backdrop-blur-sm">
+            <Nav />
           </header>
 
-          <main className="min-h-[calc(100vh-64px)]">
+          <main className="pt-16 min-h-[calc(100vh-64px)]">
             {children}
           </main>
         </div>
