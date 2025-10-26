@@ -63,7 +63,7 @@ const logout = async () => {
 const validateToken = async () => {
     try {
         console.log("Validating token...");
-        const resp = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/user/me`, { withCredentials: true });
+        const resp = await axios.get(`${API_PREFIX}/user/me`, { withCredentials: true });
         console.log("Token valid:", resp.data);
         return resp.data;
     }

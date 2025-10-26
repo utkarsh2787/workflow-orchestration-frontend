@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { validateToken } from "./api_services/auth.service";
 import axios from "axios";
 
+
 const PUBLIC_PAGES = ["/", "/login", "/register", "/auth/callback"];
 
 
@@ -26,7 +27,16 @@ export async function middleware(req: NextRequest) {
                 cookie: req.headers.get("cookie") || "", // forward cookies from incoming request
             },
         });
+        console.log("Middleware: Token valid:", resp.data);
+        // const dispatch = useDispatch();
+        // await dispatch(setUser({
+        //     email: resp.data.email,
+        //     name: resp.data.name,
+        //     id: resp.data.id,
+        // }));
+
         isValid = true;
+        console.log("Middleware: User is authenticated");
     }
     catch (err) {
         isValid = false;
