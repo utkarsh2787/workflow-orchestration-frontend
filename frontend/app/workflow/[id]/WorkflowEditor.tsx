@@ -138,7 +138,7 @@ export default function WorkflowEditor({ params }: { params: Promise<{ id: strin
             type: newType,
             name: newName || `${newType === "api" ? "API call" : "Email"} task`,
             // include request method for API tasks (default GET)
-            config: newType === "api" ? { url: "", token: "", outputExample: "", method: "GET", requestBody: "" } : { subject: "", body: "" },
+            config: newType === "api" ? { url: "", token: "", outputExample: "", method: "GET", requestBody: "" } : { subject: "", body: "", recipientlist: "" },
         };
         // copy any filled values from newConfig
         t.config = { ...t.config, ...newConfig };
@@ -190,6 +190,7 @@ export default function WorkflowEditor({ params }: { params: Promise<{ id: strin
                 else if (!isJSONObject(newConfig.requestBody)) e.push("requestBody (invalid JSON - must be an object)");
             }
         } else {
+            if (!newConfig || !newConfig.recipientlist || !newConfig.recipientlist.toString().trim()) e.push("recipientlist");
             if (!newConfig || !newConfig.subject || !newConfig.subject.toString().trim()) e.push("subject");
             if (!newConfig || !newConfig.body || !newConfig.body.toString().trim()) e.push("body");
         }
@@ -211,6 +212,7 @@ export default function WorkflowEditor({ params }: { params: Promise<{ id: strin
                     else if (!isJSONObject(t.config.requestBody)) e.push("requestBody (invalid JSON - must be an object)");
                 }
             } else if (t.type === "email") {
+                if (!t.config || !t.config.recipientlist || !t.config.recipientlist.toString().trim()) e.push("recipientlist");
                 if (!t.config || !t.config.subject || !t.config.subject.toString().trim()) e.push("subject");
                 if (!t.config || !t.config.body || !t.config.body.toString().trim()) e.push("body");
             }
@@ -240,11 +242,16 @@ export default function WorkflowEditor({ params }: { params: Promise<{ id: strin
                 name: t.name,
                 workflow_id: Number(id),
                 // inputs: for API tasks include apiurl, type (method), body, token
+                // for email tasks include recipientlist, subject, body
                 inputs: t.type === "api" ? {
                     apiurl: t.config?.url || "",
                     type: (t.config?.method || "GET").toUpperCase(),
                     body: (t.config?.method || "GET").toUpperCase() === "POST" ? tryParseJSON(t.config?.requestBody) : null,
                     token: t.config?.token || null,
+                } : t.type === "email" ? {
+                    recipientlist: t.config?.recipientlist || "",
+                    subject: t.config?.subject || "",
+                    body: t.config?.body || "",
                 } : null,
                 // schema contains the output example as an object
                 output_schema: tryParseJSON(t.config?.outputExample) || null,
@@ -272,7 +279,9 @@ export default function WorkflowEditor({ params }: { params: Promise<{ id: strin
 
     // helpers for email placeholders: list previous API tasks
     function apiTasksBefore(index: number) {
-        return tasks.slice(0, index).filter((t) => t.type === "api");
+        return tasks.slice(0, index).map((e, idx) => ({
+            ...e, index: idx
+        })).filter((t) => t.type === "api");
     }
 
     return (
@@ -373,6 +382,11 @@ export default function WorkflowEditor({ params }: { params: Promise<{ id: strin
                             ) : (
                                 <div className="grid grid-cols-1 gap-3">
                                     <div>
+                                        <label className="text-sm text-zinc-400">Recipient list</label>
+                                        <input disabled={saved} value={t.config.recipientlist || ""} onChange={(e) => updateTaskConfig(t.localId, { recipientlist: e.target.value })} className={`mt-1 w-full rounded bg-[#0b0b0b] px-3 py-2 text-zinc-100 ${errors[t.localId]?.includes("recipientlist") ? "border border-red-600" : "border border-zinc-800"} ${saved ? "opacity-60 cursor-not-allowed" : ""}`} placeholder="email1@example.com, email2@example.com" />
+                                    </div>
+
+                                    <div>
                                         <label className="text-sm text-zinc-400">Email subject</label>
                                         <input disabled={saved} value={t.config.subject || ""} onChange={(e) => updateTaskConfig(t.localId, { subject: e.target.value })} className={`mt-1 w-full rounded bg-[#0b0b0b] px-3 py-2 text-zinc-100 ${errors[t.localId]?.includes("subject") ? "border border-red-600" : "border border-zinc-800"} ${saved ? "opacity-60 cursor-not-allowed" : ""}`} />
                                     </div>
@@ -396,7 +410,7 @@ export default function WorkflowEditor({ params }: { params: Promise<{ id: strin
                                             }} className="bg-[#0b0b0b] border border-zinc-800 text-zinc-100 px-3 py-2 rounded">
                                                 <option value="">-- choose API task --</option>
                                                 {apiTasksBefore(idx).map((a) => (
-                                                    <option key={a.localId} value={a.localId}>{a.name}</option>
+                                                    <option key={a.index} value={a.index}>{a.name}</option>
                                                 ))}
                                             </select>
                                             <div className="text-sm text-zinc-500 self-center">Tokens look like <code className="bg-zinc-900 px-1 py-0.5 rounded">{`{{taskId.output}}`}</code></div>
@@ -451,6 +465,9 @@ export default function WorkflowEditor({ params }: { params: Promise<{ id: strin
                             </>
                         ) : (
                             <>
+                                <label className="text-sm text-zinc-400">Recipient list <span className="text-red-400">*</span></label>
+                                <input value={newConfig.recipientlist || ""} onChange={(e) => setNewConfig((s: any) => ({ ...s, recipientlist: e.target.value }))} placeholder="email1@example.com, email2@example.com" className={`w-full rounded bg-[#0b0b0b] px-3 py-2 text-zinc-100 ${validateNewTask().includes("recipientlist") ? "border border-red-600" : "border border-zinc-800"}`} />
+
                                 <label className="text-sm text-zinc-400">Email subject <span className="text-red-400">*</span></label>
                                 <input value={newConfig.subject || ""} onChange={(e) => setNewConfig((s: any) => ({ ...s, subject: e.target.value }))} placeholder="Email subject" className={`w-full rounded bg-[#0b0b0b] px-3 py-2 text-zinc-100 ${validateNewTask().includes("subject") ? "border border-red-600" : "border border-zinc-800"}`} />
 
