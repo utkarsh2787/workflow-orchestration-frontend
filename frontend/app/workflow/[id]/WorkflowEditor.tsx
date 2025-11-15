@@ -310,6 +310,14 @@ export default function WorkflowEditor({ params }: { params: Promise<{ id: strin
                 <div className="flex items-center gap-3">
                     <button onClick={() => openCreate("api")} disabled={saved} className={`rounded-full px-3 py-2 bg-zinc-800 border border-zinc-700 text-sm ${saved ? "opacity-50 cursor-not-allowed" : ""}`}>+ API task</button>
                     <button onClick={() => openCreate("email")} disabled={saved} className={`rounded-full px-3 py-2 bg-zinc-800 border border-zinc-700 text-sm ${saved ? "opacity-50 cursor-not-allowed" : ""}`}>+ Email task</button>
+                    {saved && (
+                        <button
+                            onClick={() => {/* TODO: implement run workflow */}}
+                            className="rounded-full px-4 py-2 font-semibold bg-gradient-to-r from-emerald-500 to-green-600 text-white hover:from-emerald-600 hover:to-green-700 transition-all"
+                        >
+                            ▶ Run
+                        </button>
+                    )}
                     {saved ? (
                         <>
                             <div className="px-4 py-2 rounded bg-zinc-800 text-sm text-emerald-300">Saved</div>
